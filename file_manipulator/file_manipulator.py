@@ -40,6 +40,24 @@ def validate_filename_and_nunber(filename1, number, check_exisrence=True, check_
 
     return True,""
 
+def validate_filenames_and_text(filename1, str1, str2, check_exisrence=True, check_file=True):
+    
+    if not isinstance(filename1,str) or not isinstance(str1,str) or not isinstance(str2,str):
+        raise TypeError("ファイル名、置き換え対象は文字列でなければいけません。")
+    
+    def _validate_filename(filename,filename_name):
+        error_message = ""
+        if check_exisrence and not os.path.exists(filename):
+            error_message = f"{filename_name}:ファイルが存在しません。"
+            return error_message
+        if check_file and not os.path.isfile(filename):
+            error_message = f"{filename_name}:ファイルではありません。"
+            return error_message
+        return error_message
+    
+    error_message1 = _validate_filename(filename1,"Filename1")
+    return not (error_message1), error_message1
+
 def main():
     if sys.argv[1] == "reverse":
         filename1 = sys.argv[2]
@@ -96,6 +114,22 @@ def main():
                 return 
             return
 
+    elif sys.argv[1] == "replace-string":
+        filename1 = sys.argv[2]
+        str1 = sys.argv[3]
+        str2 = sys.argv[4]
+        result, error1 = validate_filenames(filename1,str1,str2)
+        if not result:
+            print(f"エラー：{error1}")
+            return
+        else:
+            contents = ''
+            with open(filename1) as f:
+                contents = f.read()
+            with open(filename1,'w') as f:
+                f.write(contents.replace(str1,str2))
+            return
+        
     else :
         print("エラー：無効な操作です。")
         return
